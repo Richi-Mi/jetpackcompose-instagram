@@ -1,6 +1,7 @@
 package com.example.jetpackcomposeinstagram
 
 import android.app.Activity
+import android.content.Intent
 import android.provider.ContactsContract.CommonDataKinds.Email
 import android.util.Patterns
 import androidx.compose.foundation.Image
@@ -101,9 +102,7 @@ fun SignUp() {
 fun Body(modifier: Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var isLogInEnable by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var isLogInEnable by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = modifier
     ) {
@@ -170,7 +169,11 @@ fun LoginDivider() {
 
 @Composable
 fun LoginButton(inEnable: Boolean) {
-    Button(onClick = { /*TODO*/ },
+    val activity = LocalContext.current as Activity
+    Button(onClick = {
+        val i = Intent( activity, TwitActivity::class.java )
+        activity.startActivity( i )
+                     },
         enabled = inEnable,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
