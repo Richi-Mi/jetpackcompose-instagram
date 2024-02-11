@@ -1,9 +1,7 @@
-package com.example.jetpackcomposeinstagram
+package com.example.jetpackcomposeinstagram.login.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.provider.ContactsContract.CommonDataKinds.Email
-import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,18 +23,16 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,9 +45,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposeinstagram.R
+import com.example.jetpackcomposeinstagram.TwitActivity
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen( loginViewModel: LoginViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +58,7 @@ fun LoginScreen() {
     ) {
 
         Header(Modifier.align(Alignment.TopEnd))
-        Body(modifier = Modifier.align(Alignment.Center))
+        Body( modifier = Modifier.align(Alignment.Center), loginViewModel )
         Footer(Modifier.align(Alignment.BottomCenter))
 
     }
@@ -99,28 +97,29 @@ fun SignUp() {
 }
 
 @Composable
-fun Body(modifier: Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var isLogInEnable by rememberSaveable { mutableStateOf(false) }
+fun Body( modifier: Modifier, loginViewModel: LoginViewModel) {
+    val email: String by loginViewModel.email.observeAsState( initial = "" )
+    val password: String by loginViewModel.password.observeAsState(initial = "")
+    val isLogEnabled : Boolean by loginViewModel.isLogEnabled.observeAsState(initial = false)
+
     Column(
         modifier = modifier
     ) {
         ImageLogo(Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.size(16.dp))
-        MyEmail(mail = email) {
-            email = it
-            isLogInEnable = enableLogin( email, password )
+
+        MyEmail( mail = email ) {
+            loginViewModel.onLoginChanged( email = it, password )
         }
+
         Spacer(modifier = Modifier.size(4.dp))
         MyPassword(pass = password, onTextChange = {
-            password = it
-            isLogInEnable = enableLogin( email, password )
+            loginViewModel.onLoginChanged( email, password = it )
         })
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton(isLogInEnable)
+        LoginButton( isLogEnabled )
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(32.dp))
@@ -220,9 +219,6 @@ fun MyEmail(mail: String, onTextChange: (String) -> Unit) {
 
     )
 }
-fun enableLogin( email: String, pass : String ) = Patterns.EMAIL_ADDRESS.matcher( email ).matches() && pass.length > 6 // Patterns - Expresiones regulares
-
-
 @Composable
 fun MyPassword(pass: String, onTextChange: (String) -> Unit) {
     var passwordVisibility by remember {
