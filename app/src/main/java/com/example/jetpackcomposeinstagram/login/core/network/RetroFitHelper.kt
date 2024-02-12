@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetroFitHelper {
     fun getRetrofit() : Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://run.mocky.io/")
+            .baseUrl("https://run.mocky.io/")// Terminar con barrita
             .addConverterFactory( GsonConverterFactory.create() )
             .build()
     }

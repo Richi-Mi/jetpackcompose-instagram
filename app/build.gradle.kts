@@ -61,6 +61,7 @@ dependencies {
 
     // Trabajar con RetroFit
     implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
+    // Parseo de las respuestas a GSON
     implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
 
     implementation("androidx.activity:activity-compose:1.8.2")

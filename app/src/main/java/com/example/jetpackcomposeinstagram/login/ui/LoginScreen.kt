@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,9 +58,19 @@ fun LoginScreen( loginViewModel: LoginViewModel) {
             .background(Color.White)
     ) {
 
-        Header(Modifier.align(Alignment.TopEnd))
-        Body( modifier = Modifier.align(Alignment.Center), loginViewModel )
-        Footer(Modifier.align(Alignment.BottomCenter))
+        val isLoading by loginViewModel.isLoaging.observeAsState(initial = false)
+        if( isLoading ) {
+            Box(modifier = Modifier
+                .fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align( Alignment.Center )
+                )
+            }
+        } else {
+            Header(Modifier.align(Alignment.TopEnd))
+            Body( modifier = Modifier.align(Alignment.Center), loginViewModel )
+            Footer(Modifier.align(Alignment.BottomCenter))
+        }
 
     }
 }
@@ -119,7 +130,7 @@ fun Body( modifier: Modifier, loginViewModel: LoginViewModel) {
         Spacer(modifier = Modifier.size(8.dp))
         ForgotPassword(Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.size(16.dp))
-        LoginButton( isLogEnabled )
+        LoginButton( isLogEnabled, loginViewModel )
         Spacer(modifier = Modifier.size(16.dp))
         LoginDivider()
         Spacer(modifier = Modifier.size(32.dp))
@@ -167,11 +178,13 @@ fun LoginDivider() {
 }
 
 @Composable
-fun LoginButton(inEnable: Boolean) {
+fun LoginButton(inEnable: Boolean, loginViewModel: LoginViewModel ) {
     val activity = LocalContext.current as Activity
     Button(onClick = {
-        val i = Intent( activity, TwitActivity::class.java )
-        activity.startActivity( i )
+        loginViewModel.onLoginSelected {
+            val i = Intent( activity, TwitActivity::class.java )
+            activity.startActivity( i )
+        }
                      },
         enabled = inEnable,
         modifier = Modifier.fillMaxWidth(),
